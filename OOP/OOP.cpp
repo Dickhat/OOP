@@ -85,7 +85,7 @@ public:
 	};
 
 	//Делает видимой точку
-	void set_visible()
+	virtual void set_visible()
 	{
 		Visible = true;
 		SetPixel(hdc, X, Y, RGB(255, 0, 0));//рисуем точку установленным цветом
@@ -95,7 +95,7 @@ public:
 	};
 
 	//Делает невидимой точку
-	void set_invisible()
+	virtual void set_invisible()
 	{
 		Visible = false;
 		SetPixel(hdc, X, Y, RGB(0, 0, 0));//рисуем точку установленным цветом
@@ -166,32 +166,32 @@ public:
 		DeleteObject(PenBlack);
 	};
 
-	//Перемещает точку (static)
-	void Move_To(int X, int Y)
-	{
-		set_invisible();
-		Set_X(X);
-		Set_Y(Y);
-		set_visible();
-	}
+	////Перемещает точку (static)
+	//void Move_To(int X, int Y)
+	//{
+	//	set_invisible();
+	//	Set_X(X);
+	//	Set_Y(Y);
+	//	set_visible();
+	//}
 
-	//Перетаскивание точки (static)
-	void Drag()
-	{
-		//while 7 - выход
-		while (!KEY_DOWN(55))
-		{
-			// A - влево
-			if (KEY_DOWN(65)) Move_To(Get_X() - 20, Get_Y());
-			// W - вверх
-			else if (KEY_DOWN(87)) Move_To(Get_X(), Get_Y() - 20);
-			// D - вправо
-			else if (KEY_DOWN(68)) Move_To(Get_X() + 20, Get_Y());
-			// S - Вниз
-			else if (KEY_DOWN(83)) Move_To(Get_X(), Get_Y() + 20);
-			Sleep(10);
-		}
-	}
+	////Перетаскивание точки (static)
+	//void Drag()
+	//{
+	//	//while 7 - выход
+	//	while (!KEY_DOWN(55))
+	//	{
+	//		// A - влево
+	//		if (KEY_DOWN(65)) Move_To(Get_X() - 20, Get_Y());
+	//		// W - вверх
+	//		else if (KEY_DOWN(87)) Move_To(Get_X(), Get_Y() - 20);
+	//		// D - вправо
+	//		else if (KEY_DOWN(68)) Move_To(Get_X() + 20, Get_Y());
+	//		// S - Вниз
+	//		else if (KEY_DOWN(83)) Move_To(Get_X(), Get_Y() + 20);
+	//		Sleep(10);
+	//	}
+	//}
 };
 
 //Рисование Башни
