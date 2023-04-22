@@ -112,6 +112,24 @@ public:
 		Set_Y(Y);
 		set_visible();
 	}
+
+	//Перетаскивание точки
+	void Drag()
+	{
+		//while 7 - выход
+		while (!KEY_DOWN(55))
+		{
+			// A - влево
+			if (KEY_DOWN(65)) Move_To(Get_X() - 20, Get_Y());
+			// W - вверх
+			else if (KEY_DOWN(87)) Move_To(Get_X(), Get_Y() - 20);
+			// D - вправо
+			else if (KEY_DOWN(68)) Move_To(Get_X() + 20, Get_Y());
+			// S - Вниз
+			else if (KEY_DOWN(83)) Move_To(Get_X(), Get_Y() + 20);
+			Sleep(10);
+		}
+	}
 };
 
 //Класс фигура (Башня)
@@ -126,6 +144,7 @@ public:
 	//Делает видимой точку
 	void set_visible()
 	{
+		cout << __FUNCSIG__ << endl;
 		Visible = true;
 		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 		//делаем перо активным 
@@ -138,6 +157,7 @@ public:
 	//Делает невидимой точку
 	void set_invisible()
 	{
+		cout << __FUNCSIG__ << endl;
 		Visible = false;
 		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
 		//делаем перо активным 
@@ -146,17 +166,16 @@ public:
 		DeleteObject(PenBlack);
 	};
 
-	//Перемещение башни
+	//Перемещает точку (static)
 	void Move_To(int X, int Y)
 	{
 		set_invisible();
 		Set_X(X);
 		Set_Y(Y);
-		Paint();
 		set_visible();
 	}
 
-	//Перетаскивание башни
+	//Перетаскивание точки (static)
 	void Drag()
 	{
 		//while 7 - выход
