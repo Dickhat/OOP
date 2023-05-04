@@ -144,7 +144,6 @@ public:
 	//Делает видимой точку
 	void set_visible()
 	{
-		cout << __FUNCSIG__ << endl;
 		Visible = true;
 		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 		//делаем перо активным 
@@ -157,9 +156,9 @@ public:
 	//Делает невидимой точку
 	void set_invisible()
 	{
-		cout << __FUNCSIG__ << endl;
 		Visible = false;
-		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(0, 0, 0));
+		//Белый цвет (сейчас)
+		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
 		//делаем перо активным 
 		SelectObject(hdc, PenBlack);
 		Paint();
@@ -199,16 +198,259 @@ void Tower::Paint()
 {
 	//Основание башни
 	MoveToEx(hdc, X, Y, NULL);
-	LineTo(hdc, X + 40, Y);
-	LineTo(hdc, X + 40, Y + 100);
-	LineTo(hdc, X, Y + 100);
-	LineTo(hdc, X, Y);
-
-	//Крыша башни
-	LineTo(hdc, X - 20, Y);
-	LineTo(hdc, X + 17, Y - 60);
 	LineTo(hdc, X + 60, Y);
-	LineTo(hdc, X - 20, Y);
+	LineTo(hdc, X + 60, Y + 125);
+	LineTo(hdc, X + 40, Y + 125);
+	LineTo(hdc, X + 40, Y + 80);
+	LineTo(hdc, X + 20, Y + 80);
+	LineTo(hdc, X + 20, Y + 125);
+	LineTo(hdc, X + 40, Y + 125);
+	LineTo(hdc, X, Y + 125);
+	LineTo(hdc, X, Y);
+	
+	//Крыша башни
+	LineTo(hdc, X - 30, Y);
+	LineTo(hdc, X - 30, Y - 60);
+	LineTo(hdc, X - 5, Y - 60);
+	LineTo(hdc, X - 5, Y - 30);
+	LineTo(hdc, X + 25, Y - 30);
+	LineTo(hdc, X + 25, Y - 60);
+	LineTo(hdc, X + 50, Y - 60);
+	LineTo(hdc, X + 50, Y - 30);
+	LineTo(hdc, X + 75, Y - 30);
+	LineTo(hdc, X + 75, Y - 30);
+	LineTo(hdc, X + 75, Y - 60);
+	LineTo(hdc, X + 95, Y - 60);
+	LineTo(hdc, X + 95, Y);
+	LineTo(hdc, X, Y);
+}
+
+//Вертикальная иерархия 1
+class vertical_Tower_1 :public Tower
+{
+public:
+	//Конструктор
+	vertical_Tower_1(int X, int Y) :Tower(X, Y) {};
+
+	//Делает видимой башню
+	void set_visible()
+	{
+		Visible = true;
+		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		//делаем перо активным 
+		SelectObject(hdc, PenGreen);
+		Paint();
+
+		DeleteObject(PenGreen);
+	};
+
+	//Делает невидимой башню
+	void set_invisible()
+	{
+		Visible = false;
+		//Белый цвет (сейчас)
+		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+		//делаем перо активным 
+		SelectObject(hdc, PenWhite);
+		Paint();
+		DeleteObject(PenWhite);
+	};
+};
+
+//Вертикальная иерархия 2
+class vertical_Tower_2 :public vertical_Tower_1
+{
+public:
+	//Конструктор
+	vertical_Tower_2(int X, int Y) :vertical_Tower_1(X, Y) {};
+
+	void print_construction();
+
+	//Делает видимой башню
+	void set_visible()
+	{
+		Visible = true;
+		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		//делаем перо активным 
+		SelectObject(hdc, PenGreen);
+		Paint();
+		print_construction();
+
+		DeleteObject(PenGreen);
+	};
+
+	//Делает невидимой башню
+	void set_invisible()
+	{
+		Visible = false;
+		//Белый цвет (сейчас)
+		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+		//делаем перо активным 
+		SelectObject(hdc, PenWhite);
+		Paint();
+		print_construction();
+
+		DeleteObject(PenWhite);
+	};
+};
+
+void vertical_Tower_2::print_construction()
+{
+	//Пристройка башни
+	MoveToEx(hdc, X, Y, NULL);
+	LineTo(hdc, X + 60, Y);
+	LineTo(hdc, X + 60, Y + 63);
+	LineTo(hdc, X + 150, Y + 63);
+	LineTo(hdc, X + 150, Y + 125);
+	LineTo(hdc, X + 60, Y + 125 );
+
+	//Крыша пристройки
+	LineTo(hdc, X + 60, Y);
+	LineTo(hdc, X + 60, Y + 35);
+	LineTo(hdc, X + 130, Y + 35);
+	LineTo(hdc, X + 150, Y + 63);
+
+	//Окно пристройки
+	MoveToEx(hdc,X + 100, Y + 100, NULL);
+	LineTo(hdc, X + 100, Y + 80);
+	LineTo(hdc, X + 100, Y + 80);
+	LineTo(hdc, X + 125, Y + 80);
+	LineTo(hdc, X + 125, Y + 100);
+	LineTo(hdc, X + 100, Y + 100);
+	LineTo(hdc, X + 112, Y + 100);
+	LineTo(hdc, X + 112, Y + 80);
+}
+
+//Веерная иерархия 1
+class left_construction_Tower : public Tower
+{
+public:
+	//Конструктор
+	left_construction_Tower(int X, int Y) :Tower(X, Y) {};
+
+	//Левая конструкция
+	void left_print();
+
+	//Делает видимой башню
+	void set_visible()
+	{
+		Visible = true;
+		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		//делаем перо активным 
+		SelectObject(hdc, PenGreen);
+		Paint();
+		left_print();
+		
+		DeleteObject(PenGreen);
+	};
+
+	//Делает невидимой башню
+	void set_invisible()
+	{
+		Visible = false;
+		//Белый цвет (сейчас)
+		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+		//делаем перо активным 
+		SelectObject(hdc, PenWhite);
+		Paint();
+		left_print();
+
+		DeleteObject(PenWhite);
+	};
+};
+
+//Левая пристройка
+void left_construction_Tower::left_print()
+{
+	//Пристройка башни
+	MoveToEx(hdc, X, Y, NULL);
+	LineTo(hdc, X , Y);
+	LineTo(hdc, X , Y + 63);
+	LineTo(hdc, X - 90, Y + 63);
+	LineTo(hdc, X - 90, Y + 125);
+	LineTo(hdc, X , Y + 125);
+
+	//Крыша пристройки
+	LineTo(hdc, X , Y);
+	LineTo(hdc, X , Y + 35);
+	LineTo(hdc, X - 70, Y + 35);
+	LineTo(hdc, X - 90, Y + 63);
+	
+	//Окно пристройки
+	MoveToEx(hdc, X - 40, Y + 100, NULL);
+	LineTo(hdc, X - 40, Y + 80);
+	LineTo(hdc, X - 40, Y + 80);
+	LineTo(hdc, X - 65, Y + 80);
+	LineTo(hdc, X - 65, Y + 100);
+	LineTo(hdc, X - 40, Y + 100);
+	LineTo(hdc, X - 53, Y + 100);
+	LineTo(hdc, X - 53, Y + 80);
+}
+
+//Веерная иерархия 2
+class right_construction_Tower : public Tower
+{
+public:
+	//Конструктор
+	right_construction_Tower(int X, int Y) :Tower(X, Y) {};
+
+	//Правая конструкция
+	void right_print();
+
+	//Делает видимой башню
+	void set_visible()
+	{
+		Visible = true;
+		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		//делаем перо активным 
+		SelectObject(hdc, PenGreen);
+		Paint();
+		right_print();
+
+		DeleteObject(PenGreen);
+	};
+
+	//Делает невидимой башню
+	void set_invisible()
+	{
+		Visible = false;
+		//Белый цвет (сейчас)
+		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+		//делаем перо активным 
+		SelectObject(hdc, PenWhite);
+		Paint();
+		right_print();
+
+		DeleteObject(PenWhite);
+	};
+};
+
+//Правая пристройка
+void right_construction_Tower::right_print()
+{
+	//Пристройка башни
+	MoveToEx(hdc, X, Y, NULL);
+	LineTo(hdc, X + 60, Y);
+	LineTo(hdc, X + 60, Y + 63);
+	LineTo(hdc, X + 150, Y + 63);
+	LineTo(hdc, X + 150, Y + 125);
+	LineTo(hdc, X + 60, Y + 125);
+
+	//Крыша пристройки
+	LineTo(hdc, X + 60, Y);
+	LineTo(hdc, X + 60, Y + 35);
+	LineTo(hdc, X + 130, Y + 35);
+	LineTo(hdc, X + 150, Y + 63);
+
+	//Окно пристройки
+	MoveToEx(hdc, X + 100, Y + 100, NULL);
+	LineTo(hdc, X + 100, Y + 80);
+	LineTo(hdc, X + 100, Y + 80);
+	LineTo(hdc, X + 125, Y + 80);
+	LineTo(hdc, X + 125, Y + 100);
+	LineTo(hdc, X + 100, Y + 100);
+	LineTo(hdc, X + 112, Y + 100);
+	LineTo(hdc, X + 112, Y + 80);
 }
 
 int main()
@@ -231,7 +473,8 @@ int main()
 	APoint.set_invisible();	//Исчезновение точки
 
 	PressKey(51);			//3
-	Tower bashna(APoint.Get_X(), APoint.Get_Y());//Создание объекта башни в координатах 200,200
+	//Tower tow(APoint.Get_X(), APoint.Get_Y());
+	right_construction_Tower bashna(APoint.Get_X(), APoint.Get_Y());//Создание объекта башни в координатах 200,200
 	bashna.Paint();			//Рисование башни
 	bashna.set_visible();   //Появление башни
 
@@ -245,5 +488,6 @@ int main()
 	bashna.Drag();			//Перетаскивание башни
 
 	DeleteObject(Pen);
+
 	return 0;
 }
