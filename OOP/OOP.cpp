@@ -1,9 +1,4 @@
-﻿#include <iostream>
-#include <windows.h>
-#include <conio.h>
-#include <vector>
-
-using namespace std;
+﻿#include "classes.h"
 
 HDC hdc;//Контекст устройства(содержит описание видеокарты и всех необходимых графических элементов)
 
@@ -33,189 +28,74 @@ void PressKey(int VkCode)
 			break;
 }
 
-//Класс местоположение
-class Location
+//Делает видимой точку
+void Point::set_visible()
 {
-protected:
-	int X;//Координата X
-	int Y;//Координата Y
-
-public:
-	//Конструктор
-	Location(int ind_X, int ind_Y)
-	{
-		X = ind_X;
-		Y = ind_Y;
-	}
-
-	//Возвращает X
-	int Get_X()
-	{
-		return X;
-	};
-
-	//Возвращает Y
-	int Get_Y()
-	{
-		return Y;
-	}
-
-	//Устанавливает X
-	void Set_X(int ind_X)
-	{
-		X = ind_X;
-	};
-
-	//Устанавливает Y
-	void Set_Y(int ind_Y)
-	{
-		Y = ind_Y;
-	};
+	Visible = true;
+	SetPixel(hdc, X, Y, RGB(255, 0, 0));		//рисуем точку установленным цветом
+	SetPixel(hdc, X + 1, Y, RGB(255, 0, 0));	//рисуем точку установленным цветом
+	SetPixel(hdc, X, Y + 1, RGB(255, 0, 0));	//рисуем точку установленным цветом
+	SetPixel(hdc, X + 1, Y + 1, RGB(255, 0, 0));//рисуем точку установленным цветом
+	current_region(X, Y);						//Текущая область фигуры
 };
 
-//Класс точка
-class Point :public Location
+//Делает невидимой точку
+void Point::set_invisible()
 {
-protected:
-	bool Visible;//Видимость точки
+	Visible = false;
+	SetPixel(hdc, X, Y, RGB(0, 0, 0));			//рисуем точку установленным цветом
+	SetPixel(hdc, X + 1, Y, RGB(0, 0, 0));		//рисуем точку установленным цветом
+	SetPixel(hdc, X, Y + 1, RGB(0, 0, 0));		//рисуем точку установленным цветом
+	SetPixel(hdc, X + 1, Y + 1, RGB(0, 0, 0));	//рисуем точку установленным цветом
+};
 
-	struct heat_box
+//Текущая область фигуры
+void Point::current_region(int X, int Y)
+{
+	boxheat.start_X = X;
+	boxheat.end_X = X + 1;
+	boxheat.start_Y = Y;
+	boxheat.end_Y = Y + 1;
+};
+
+//Перемещает точку
+void Point::Move_To(int X, int Y)
+{
+	set_invisible();
+	Set_X(X);
+	Set_Y(Y);
+	set_visible();
+}
+
+//Перетаскивание точки
+void Point::Drag()
+{
+	//while 7 - выход
+	while (!KEY_DOWN(55))
 	{
-		int start_X, end_X, start_Y, end_Y;	//Координаты фигуры(В форме квадрата)
-	} boxheat;
-
-public:
-	//КОНСТРУКТОР
-	Point(int X, int Y) :Location(X, Y)
-	{ 
-		Visible = false;
-		boxheat.start_X = X;
-		boxheat.end_X = X + 1;
-		boxheat.start_Y = Y;
-		boxheat.end_Y = Y + 1;
-	};
-
-	//Возвращает хитбоксы
-	const heat_box & get()
-	{
-		return boxheat;
-	}
-
-	//Делает видимой точку
-	virtual void set_visible()
-	{
-		Visible = true;
-		SetPixel(hdc, X, Y, RGB(255, 0, 0));		//рисуем точку установленным цветом
-		SetPixel(hdc, X + 1, Y, RGB(255, 0, 0));	//рисуем точку установленным цветом
-		SetPixel(hdc, X, Y + 1, RGB(255, 0, 0));	//рисуем точку установленным цветом
-		SetPixel(hdc, X + 1, Y + 1, RGB(255, 0, 0));//рисуем точку установленным цветом
-		current_region(X, Y);						//Текущая область фигуры
-	};
-
-	//Делает невидимой точку
-	virtual void set_invisible()
-	{
-		Visible = false;
-		SetPixel(hdc, X, Y, RGB(0, 0, 0));			//рисуем точку установленным цветом
-		SetPixel(hdc, X + 1, Y, RGB(0, 0, 0));		//рисуем точку установленным цветом
-		SetPixel(hdc, X, Y + 1, RGB(0, 0, 0));		//рисуем точку установленным цветом
-		SetPixel(hdc, X + 1, Y + 1, RGB(0, 0, 0));	//рисуем точку установленным цветом
-	};
-
-	//Текущая область фигуры
-	virtual void current_region(int X, int Y)
-	{
-		boxheat.start_X = X;
-		boxheat.end_X = X + 1;
-		boxheat.start_Y = Y;
-		boxheat.end_Y = Y + 1;
-	};
-
-	//Перемещает точку
-	void Move_To(int X, int Y)
-	{
-		set_invisible();
-		Set_X(X);
-		Set_Y(Y);
-		set_visible();
-	}
-
-	//Перетаскивание точки
-	void Drag()
-	{
-		//while 7 - выход
-		while (!KEY_DOWN(55))
+		// A - влево
+		if (KEY_DOWN(65))
 		{
-			// A - влево
-			if (KEY_DOWN(65))
-			{
-				Move_To(Get_X() - 20, Get_Y());
-			}
-			// W - вверх
-			else if (KEY_DOWN(87)) 
-			{
-				Move_To(Get_X(), Get_Y() - 20);
-			}
-			// D - вправо
-			else if (KEY_DOWN(68))
-			{
-				Move_To(Get_X() + 20, Get_Y());
-			}
-			// S - Вниз
-			else if (KEY_DOWN(83))
-			{
-				Move_To(Get_X(), Get_Y() + 20);
-			}
-			Sleep(10);
+			Move_To(Get_X() - 20, Get_Y());
 		}
+		// W - вверх
+		else if (KEY_DOWN(87))
+		{
+			Move_To(Get_X(), Get_Y() - 20);
+		}
+		// D - вправо
+		else if (KEY_DOWN(68))
+		{
+			Move_To(Get_X() + 20, Get_Y());
+		}
+		// S - Вниз
+		else if (KEY_DOWN(83))
+		{
+			Move_To(Get_X(), Get_Y() + 20);
+		}
+		Sleep(10);
 	}
-};
-
-//Класс ядро
-class ball :public Point
-{
-protected:
-	int radius;
-public:
-	//Конструктор
-	ball(int X, int Y, int Rad) :Point(X, Y) { radius = Rad; };
-
-	void Paint_ball();
-
-	void set_rad(int Rad) { radius = Rad; };
-	int get_rad() { return radius; };
-
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X - radius;
-		boxheat.end_X = X + radius;
-		boxheat.start_Y = Y + radius;
-		boxheat.end_Y = Y - radius;
-	}
-
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenBlack);
-		Paint_ball();
-		current_region(X, Y);						//Текущая область фигуры
-
-		DeleteObject(PenBlack);
-	}
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenBlack);
-		Paint_ball();
-
-		DeleteObject(PenBlack);
-	}
-};
+}
 
 //Рисование ядра
 void ball::Paint_ball()
@@ -223,76 +103,38 @@ void ball::Paint_ball()
 	Ellipse(hdc, X - radius, Y - radius, X + radius, Y + radius);
 }
 
-//Класс фигура (Башня)
-class Tower :public Point
+//Запоминает местоположение фигуры
+void ball::current_region(int X, int Y)
 {
-public:
-	Tower(int X, int Y) :Point(X, Y) {
-		
-	};
-	void virtual Paint();
+	boxheat.start_X = X - radius;
+	boxheat.end_X = X + radius;
+	boxheat.start_Y = Y + radius;
+	boxheat.end_Y = Y - radius;
+}
 
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X - 30;
-		boxheat.end_X = X + 95;
-		boxheat.start_Y = Y + 125;
-		boxheat.end_Y = Y - 60;
-	};
+void ball::set_visible()
+{
+	Visible = true;
+	HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenBlack);
+	Paint_ball();
+	current_region(X, Y);						//Текущая область фигуры
 
-	//Делает видимой точку
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenBlack);
-		Paint();
-		current_region(X, Y);
+	DeleteObject(PenBlack);
+}
 
-		DeleteObject(PenBlack);
-	};
+void ball::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenBlack);
+	Paint_ball();
 
-	//Делает невидимой точку
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenBlack);
-		Paint();
-
-		DeleteObject(PenBlack);
-	};
-
-	////Перемещает точку (static)
-	//void Move_To(int X, int Y)
-	//{
-	//	set_invisible();
-	//	Set_X(X);
-	//	Set_Y(Y);
-	//	set_visible();
-	//}
-
-	////Перетаскивание точки (static)
-	//void Drag()
-	//{
-	//	//while 7 - выход
-	//	while (!KEY_DOWN(55))
-	//	{
-	//		// A - влево
-	//		if (KEY_DOWN(65)) Move_To(Get_X() - 20, Get_Y());
-	//		// W - вверх
-	//		else if (KEY_DOWN(87)) Move_To(Get_X(), Get_Y() - 20);
-	//		// D - вправо
-	//		else if (KEY_DOWN(68)) Move_To(Get_X() + 20, Get_Y());
-	//		// S - Вниз
-	//		else if (KEY_DOWN(83)) Move_To(Get_X(), Get_Y() + 20);
-	//		Sleep(10);
-	//	}
-	//}
-};
+	DeleteObject(PenBlack);
+}
 
 //Рисование Башни
 void Tower::Paint()
@@ -326,93 +168,74 @@ void Tower::Paint()
 	LineTo(hdc, X, Y);
 }
 
-//Вертикальная иерархия 1
-class vertical_Tower_1 :public Tower
+void Tower::current_region(int X, int Y)
 {
-public:
-	//Конструктор
-	vertical_Tower_1(int X, int Y) :Tower(X, Y) {};
-
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X - 30;
-		boxheat.end_X = X + 95;
-		boxheat.start_Y = Y + 125;
-		boxheat.end_Y = Y - 60;
-	};
-
-	//Делает видимой башню
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenGreen);
-		Paint();
-		current_region(X, Y);
-
-		DeleteObject(PenGreen);
-	};
-
-	//Делает невидимой башню
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenWhite);
-		Paint();
-		DeleteObject(PenWhite);
-	};
+	boxheat.start_X = X - 30;
+	boxheat.end_X = X + 95;
+	boxheat.start_Y = Y + 125;
+	boxheat.end_Y = Y - 60;
 };
 
-//Вертикальная иерархия 2
-class vertical_Tower_2 :public vertical_Tower_1
+//Делает видимой точку
+void Tower::set_visible()
 {
-public:
-	//Конструктор
-	vertical_Tower_2(int X, int Y) :vertical_Tower_1(X, Y) {};
+	Visible = true;
+	HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenBlack);
+	Paint();
+	current_region(X, Y);
 
-	void print_construction();
-	
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X;
-		boxheat.end_X = X + 150;
-		boxheat.start_Y = Y + 125;
-		boxheat.end_Y = Y;
-	};
-
-	//Делает видимой башню
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenGreen);
-		Paint();
-		print_construction();
-		current_region(X, Y);
-
-		DeleteObject(PenGreen);
-	};
-
-	//Делает невидимой башню
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenWhite);
-		Paint();
-		print_construction();
-
-		DeleteObject(PenWhite);
-	};
+	DeleteObject(PenBlack);
 };
 
+//Делает невидимой точку
+void Tower::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenBlack = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenBlack);
+	Paint();
+
+	DeleteObject(PenBlack);
+};
+
+void vertical_Tower_1::current_region(int X, int Y)
+{
+	boxheat.start_X = X - 30;
+	boxheat.end_X = X + 95;
+	boxheat.start_Y = Y + 125;
+	boxheat.end_Y = Y - 60;
+};
+
+//Делает видимой башню
+void vertical_Tower_1::set_visible()
+{
+	Visible = true;
+	HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenGreen);
+	Paint();
+	current_region(X, Y);
+
+	DeleteObject(PenGreen);
+};
+
+//Делает невидимой башню
+void vertical_Tower_1::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenWhite);
+	Paint();
+	DeleteObject(PenWhite);
+};
+
+//Рисование башни в вертикальной иерархии
 void vertical_Tower_2::print_construction()
 {
 	//Пристройка башни
@@ -421,7 +244,7 @@ void vertical_Tower_2::print_construction()
 	LineTo(hdc, X + 60, Y + 63);
 	LineTo(hdc, X + 150, Y + 63);
 	LineTo(hdc, X + 150, Y + 125);
-	LineTo(hdc, X + 60, Y + 125 );
+	LineTo(hdc, X + 60, Y + 125);
 
 	//Крыша пристройки
 	LineTo(hdc, X + 60, Y);
@@ -430,7 +253,7 @@ void vertical_Tower_2::print_construction()
 	LineTo(hdc, X + 150, Y + 63);
 
 	//Окно пристройки
-	MoveToEx(hdc,X + 100, Y + 100, NULL);
+	MoveToEx(hdc, X + 100, Y + 100, NULL);
 	LineTo(hdc, X + 100, Y + 80);
 	LineTo(hdc, X + 100, Y + 80);
 	LineTo(hdc, X + 125, Y + 80);
@@ -440,55 +263,43 @@ void vertical_Tower_2::print_construction()
 	LineTo(hdc, X + 112, Y + 80);
 }
 
-//Веерная иерархия 1
-class left_construction_Tower : public Tower
+void vertical_Tower_2::current_region(int X, int Y)
 {
-public:
-	//Конструктор
-	left_construction_Tower(int X, int Y) :Tower(X, Y) {};
-
-	//Левая конструкция
-	void left_print();
-
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X - 90;
-		boxheat.end_X = X;
-		boxheat.start_Y = Y + 125;
-		boxheat.end_Y = Y;
-	};
-
-
-	//Делает видимой башню
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenGreen);
-		Paint();
-		left_print();
-		current_region(X, Y);
-
-		DeleteObject(PenGreen);
-	};
-
-	//Делает невидимой башню
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenWhite);
-		Paint();
-		left_print();
-
-		DeleteObject(PenWhite);
-	};
+	boxheat.start_X = X;
+	boxheat.end_X = X + 150;
+	boxheat.start_Y = Y + 125;
+	boxheat.end_Y = Y;
 };
 
-//Левая пристройка
+//Делает видимой башню в вертикальной иерархии 2
+void vertical_Tower_2::set_visible()
+{
+	Visible = true;
+	HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenGreen);
+	Paint();
+	print_construction();
+	current_region(X, Y);
+
+	DeleteObject(PenGreen);
+};
+
+//Делает невидимой башню в вертикальной иерархии 2
+void vertical_Tower_2::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenWhite);
+	Paint();
+	print_construction();
+
+	DeleteObject(PenWhite);
+};
+
+//Левая пристройка в веерной иерархии
 void left_construction_Tower::left_print()
 {
 	//Пристройка башни
@@ -516,52 +327,40 @@ void left_construction_Tower::left_print()
 	LineTo(hdc, X - 53, Y + 80);
 }
 
-//Веерная иерархия 2
-class right_construction_Tower : public Tower
+void left_construction_Tower::current_region(int X, int Y)
 {
-public:
-	//Конструктор
-	right_construction_Tower(int X, int Y) :Tower(X, Y) {};
+	boxheat.start_X = X - 90;
+	boxheat.end_X = X;
+	boxheat.start_Y = Y + 125;
+	boxheat.end_Y = Y;
+};
 
-	//Правая конструкция
-	void right_print();
+//Делает видимой левую башню в веерной иерархии
+void left_construction_Tower::set_visible()
+{
+	Visible = true;
+	HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenGreen);
+	Paint();
+	left_print();
+	current_region(X, Y);
 
-	void current_region(int X, int Y)
-	{
-		boxheat.start_X = X;
-		boxheat.end_X = X + 150;
-		boxheat.start_Y = Y + 125;
-		boxheat.end_Y = Y;
-	};
+	DeleteObject(PenGreen);
+};
 
+//Делает невидимой левую башню в веерной иерархии
+void left_construction_Tower::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenWhite);
+	Paint();
+	left_print();
 
-	//Делает видимой башню
-	void set_visible()
-	{
-		Visible = true;
-		HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
-		//делаем перо активным 
-		SelectObject(hdc, PenGreen);
-		Paint();
-		right_print();
-		current_region(X, Y);
-
-		DeleteObject(PenGreen);
-	};
-
-	//Делает невидимой башню
-	void set_invisible()
-	{
-		Visible = false;
-		//Белый цвет (сейчас)
-		HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-		//делаем перо активным 
-		SelectObject(hdc, PenWhite);
-		Paint();
-		right_print();
-
-		DeleteObject(PenWhite);
-	};
+	DeleteObject(PenWhite);
 };
 
 //Правая пристройка
@@ -591,6 +390,42 @@ void right_construction_Tower::right_print()
 	LineTo(hdc, X + 112, Y + 100);
 	LineTo(hdc, X + 112, Y + 80);
 }
+
+void right_construction_Tower::current_region(int X, int Y)
+{
+	boxheat.start_X = X;
+	boxheat.end_X = X + 150;
+	boxheat.start_Y = Y + 125;
+	boxheat.end_Y = Y;
+};
+
+//Делает видимой правую башню в веерной иерархии
+void right_construction_Tower::set_visible()
+{
+	Visible = true;
+	HPEN PenGreen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+	//делаем перо активным 
+	SelectObject(hdc, PenGreen);
+	Paint();
+	right_print();
+	current_region(X, Y);
+
+	DeleteObject(PenGreen);
+};
+
+//Делает невидимой правую башню в веерной иерархии
+void right_construction_Tower::set_invisible()
+{
+	Visible = false;
+	//Белый цвет (сейчас)
+	HPEN PenWhite = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+	//делаем перо активным 
+	SelectObject(hdc, PenWhite);
+	Paint();
+	right_print();
+
+	DeleteObject(PenWhite);
+};
 
 //ПРоверка столкновений
 void check(int current, vector <Tower*>& Tow, vector <ball*>& BALL);
@@ -679,7 +514,7 @@ int main()
 	return 0;
 }
 
-//ПРоверка столкновений
+//Проверка столкновений
 void check(int current,vector <Tower*>& Tow, vector <ball*>& BALL)
 {
 	for (int i = 0; i < BALL.size(); ++i)
