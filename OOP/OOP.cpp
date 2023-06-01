@@ -440,12 +440,10 @@ int main()
 	HPEN Pen = CreatePen(PS_SOLID, 2, RGB(255, 255, 255));
 	SelectObject(hdc, Pen);
 
-	Tower* Pcur;				//Указатель на текущий элемент
 	Point APoint(200, 200);
 
 	vertical_Tower_1 green_tw_1(400, 200);
 	vertical_Tower_2 green_tw_2(600, 200);
-
 
 	left_construction_Tower cons_tw_1(200, 400);
 	right_construction_Tower cons_tw_2(400, 400);
@@ -470,26 +468,22 @@ int main()
 	BALL[2] = &bill_3;
 
 	PressKey(49);			//1
-	Pcur = &green_tw_1;
 	green_tw_1.set_visible();
 	green_tw_1.Drag();
 	check(Tow, BALL);
 	Sleep(200);
 
 	PressKey(50);			//2
-	Pcur = &green_tw_2;
 	green_tw_2.set_visible();
 	green_tw_2.Drag();
 	check(Tow, BALL);
 
 	PressKey(51);			//3
-	Pcur = &cons_tw_1;
 	cons_tw_1.set_visible();
 	cons_tw_1.Drag();
 	check(Tow, BALL);
 
 	PressKey(52);			//4
-	Pcur = &cons_tw_2;
 	cons_tw_2.set_visible();
 	cons_tw_2.Drag();
 	check(Tow, BALL);
