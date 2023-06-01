@@ -428,7 +428,7 @@ void right_construction_Tower::set_invisible()
 };
 
 //ПРоверка столкновений
-void check(int current, vector <Tower*>& Tow, vector <ball*>& BALL);
+void check(vector <Tower*>& Tow, vector <ball*>& BALL);
 
 int main()
 {
@@ -445,13 +445,10 @@ int main()
 
 	vertical_Tower_1 green_tw_1(400, 200);
 	vertical_Tower_2 green_tw_2(600, 200);
-	green_tw_1.set_visible();
-	green_tw_2.set_visible();
+
 
 	left_construction_Tower cons_tw_1(200, 400);
 	right_construction_Tower cons_tw_2(400, 400);
-	cons_tw_1.set_visible();
-	cons_tw_2.set_visible();
 
 	ball bill_1(APoint.Get_X(), APoint.Get_Y(), 10);
 	ball bill_2(800, 400, 40);
@@ -474,40 +471,28 @@ int main()
 
 	PressKey(49);			//1
 	Pcur = &green_tw_1;
+	green_tw_1.set_visible();
 	green_tw_1.Drag();
-	check(0, Tow, BALL);
+	check(Tow, BALL);
 	Sleep(200);
-
-	//APoint.Move_To(APoint.Get_X() + 100, APoint.Get_Y());//Перемещение точки
 
 	PressKey(50);			//2
 	Pcur = &green_tw_2;
+	green_tw_2.set_visible();
 	green_tw_2.Drag();
-	check(1, Tow, BALL);
-	//APoint.set_invisible();	//Исчезновение точки
+	check(Tow, BALL);
 
 	PressKey(51);			//3
 	Pcur = &cons_tw_1;
+	cons_tw_1.set_visible();
 	cons_tw_1.Drag();
-	check(2, Tow, BALL);
-	//vertical_Tower_2 bashna(APoint.Get_X(), APoint.Get_Y());//Создание объекта башни в координатах 200,200
-	//bashna.Paint();			//Рисование башни
-	//bashna.set_visible();   //Появление башни
+	check(Tow, BALL);
 
 	PressKey(52);			//4
 	Pcur = &cons_tw_2;
+	cons_tw_2.set_visible();
 	cons_tw_2.Drag();
-	check(3, Tow, BALL);
-	//bashna.Move_To(bashna.Get_X() + 100, bashna.Get_Y());//Перемещение башни
-
-	//PressKey(53);			//5
-	//bill.Drag();
-
-	//bashna.set_invisible();	//Исчезновение башни
-
-	//PressKey(54);			//6
-	
-	//bashna.Drag();			//Перетаскивание башни
+	check(Tow, BALL);
 
 	DeleteObject(Pen);
 
@@ -515,24 +500,26 @@ int main()
 }
 
 //Проверка столкновений
-void check(int current,vector <Tower*>& Tow, vector <ball*>& BALL)
+void check(vector <Tower*>& Tow, vector <ball*>& BALL)
 {
-	for (int i = 0; i < BALL.size(); ++i)
-	{
-		//if Проверка, что объекты столкнулись
-		if (Tow[current]->get().end_X < BALL[i]->get().start_X
-			|| Tow[current]->get().start_X > BALL[i]->get().end_X
-			|| Tow[current]->get().end_Y > BALL[i]->get().start_Y
-			|| Tow[current]->get().start_Y < BALL[i]->get().end_Y)
-			cout << "collision undetect\n";
-		else
+	for(int i = 0; i < Tow.size(); ++i)
+		for (int j = 0; j < BALL.size(); ++j)
 		{
-			Tow[current]->set_invisible();	//Разрушить объект
-			Tow[current]->Move_To(Tow[current]->Get_X() + 10000, Tow[current]->Get_Y() + 10000);
-			BALL[i]->set_invisible();		//Разрушить объект
-			BALL[i]->Move_To(BALL[i]->Get_X() + 15000, BALL[i]->Get_Y() + 15000);
-			cout << "collision detect\n";
-			break;
+			//if Проверка, что объекты столкнулись
+			if (Tow[i]->get().end_X < BALL[j]->get().start_X
+				|| Tow[i]->get().start_X > BALL[j]->get().end_X
+				|| Tow[i]->get().end_Y > BALL[j]->get().start_Y
+				|| Tow[i]->get().start_Y < BALL[j]->get().end_Y)
+			{
+				//Ничего не делать, если не столкнулись
+			}
+			else
+			{
+				Tow[i]->set_invisible();	//Разрушить объект
+				Tow[i]->Move_To(Tow[i]->Get_X() + 10000, Tow[i]->Get_Y() + 10000);
+				BALL[i]->set_invisible();		//Разрушить объект
+				BALL[j]->Move_To(BALL[j]->Get_X() + 15000, BALL[j]->Get_Y() + 15000);
+				break;
+			}
 		}
-	}
 };
