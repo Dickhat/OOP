@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <vector>
+#include "support.h"
 
 using namespace std;
 
