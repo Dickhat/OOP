@@ -41,36 +41,6 @@ void Point::Move_To(int X, int Y)
 	set_visible();
 }
 
-//Перетаскивание точки
-void Point::Drag()
-{
-	//while 7 - выход
-	while (!KEY_DOWN(55))
-	{
-		// A - влево
-		if (KEY_DOWN(65))
-		{
-			Move_To(Get_X() - 20, Get_Y());
-		}
-		// W - вверх
-		else if (KEY_DOWN(87))
-		{
-			Move_To(Get_X(), Get_Y() - 20);
-		}
-		// D - вправо
-		else if (KEY_DOWN(68))
-		{
-			Move_To(Get_X() + 20, Get_Y());
-		}
-		// S - Вниз
-		else if (KEY_DOWN(83))
-		{
-			Move_To(Get_X(), Get_Y() + 20);
-		}
-		Sleep(10);
-	}
-}
-
 //Рисование ядра
 void ball::Paint_ball()
 {

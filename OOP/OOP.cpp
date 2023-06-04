@@ -3,7 +3,45 @@
 HDC hdc;//Контекст устройства(содержит описание видеокарты и всех необходимых графических элементов)
 
 //ПРоверка столкновений
-void check(vector <Tower*>& Tow, vector <ball*>& BALL);
+bool check(vector <Tower*>& Tow, vector <ball*>& BALL);
+
+void Drag(Point* current, vector <Tower*>& Tow, vector <ball*>& BALL)
+{
+	//while 7 - выход
+	while (!KEY_DOWN(55))
+	{
+		// A - влево
+		if (KEY_DOWN(65))
+		{
+			
+			current->Move_To(current->Get_X() - 20, current->Get_Y());
+			if (check(Tow, BALL) == 1)
+				break;
+		}
+		// W - вверх
+		else if (KEY_DOWN(87))
+		{
+			current->Move_To(current->Get_X(), current->Get_Y() - 20);
+			if (check(Tow, BALL) == 1)
+				break;
+		}
+		// D - вправо
+		else if (KEY_DOWN(68))
+		{
+			current->Move_To(current->Get_X() + 20, current->Get_Y());
+			if (check(Tow, BALL) == 1)
+				break;
+		}
+		// S - Вниз
+		else if (KEY_DOWN(83))
+		{
+			current->Move_To(current->Get_X(), current->Get_Y() + 20);
+			if (check(Tow, BALL) == 1)
+				break;
+		}
+		Sleep(10);
+	}
+}
 
 int main()
 {
@@ -44,24 +82,20 @@ int main()
 
 	PressKey(49);			//1
 	green_tw_1.set_visible();
-	green_tw_1.Drag();
-	check(Tow, BALL);
+	Drag(Tow[0], Tow, BALL);
 	Sleep(200);
 
 	PressKey(50);			//2
 	green_tw_2.set_visible();
-	green_tw_2.Drag();
-	check(Tow, BALL);
+	Drag(Tow[1], Tow, BALL);
 
 	PressKey(51);			//3
 	cons_tw_1.set_visible();
-	cons_tw_1.Drag();
-	check(Tow, BALL);
+	Drag(Tow[2], Tow, BALL);
 
 	PressKey(52);			//4
 	cons_tw_2.set_visible();
-	cons_tw_2.Drag();
-	check(Tow, BALL);
+	Drag(Tow[3], Tow, BALL);
 
 	DeleteObject(Pen);
 
@@ -69,7 +103,7 @@ int main()
 }
 
 //Проверка столкновений
-void check(vector <Tower*>& Tow, vector <ball*>& BALL)
+bool check(vector <Tower*>& Tow, vector <ball*>& BALL)
 {
 	for(int i = 0; i < Tow.size(); ++i)
 		for (int j = 0; j < BALL.size(); ++j)
@@ -86,9 +120,10 @@ void check(vector <Tower*>& Tow, vector <ball*>& BALL)
 			{
 				Tow[i]->set_invisible();	//Разрушить объект
 				Tow[i]->Move_To(Tow[i]->Get_X() + 10000, Tow[i]->Get_Y() + 10000);
-				BALL[i]->set_invisible();		//Разрушить объект
+				BALL[j]->set_invisible();		//Разрушить объект
 				BALL[j]->Move_To(BALL[j]->Get_X() + 15000, BALL[j]->Get_Y() + 15000);
-				break;
+				return true;
 			}
 		}
+	return false;
 };
